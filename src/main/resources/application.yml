@@ -7,3 +7,5 @@ amazon:
     url: http://localhost:8000/
 server:
   port: 9000
+  error:
+    include-message: always
