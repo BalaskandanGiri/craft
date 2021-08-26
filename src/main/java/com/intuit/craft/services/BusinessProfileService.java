@@ -1,12 +1,15 @@
 package com.intuit.craft.services;
 
+import com.intuit.craft.Exceptions.BadRequest;
 import com.intuit.craft.data.BusinessProfileData;
+import com.intuit.craft.data.validate;
 import com.intuit.craft.entities.BusinessProfile;
 import com.intuit.craft.entities.Product;
 import com.intuit.craft.repositories.BusinessProfileRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +24,8 @@ public class BusinessProfileService {
 
     @Autowired
     ProductService productService;
+
+    RestTemplate restTemplate;
 
     BusinessProfile businessProfileMapper(BusinessProfileData businessProfileData){
         BusinessProfile businessProfile = BusinessProfile.builder().companyName(businessProfileData.getCompanyName())
@@ -45,38 +50,50 @@ public class BusinessProfileService {
 
     public BusinessProfile postBusinessProfile(BusinessProfileData businessProfileData){
         BusinessProfile businessProfile = this.businessProfileMapper(businessProfileData);
-        List<Thread> threads = new ArrayList<>();
-        for(Product product: businessProfile.getProducts()) {
-            Thread temp = new Thread(new ValidateProduct(product));
-            temp.start();
-            threads.add(temp);
-        }
-        for(Thread thread: threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                log.error(e.getMessage());
-            }
-        }
-        return businessProfileRepository.save(businessProfile);
+        return asyncValidate(businessProfile);
     }
 
     public void deleteBusinessProfile(String id) {
+        if (businessProfileRepository.getById(id)== null) {
+            throw new BadRequest("No BusinessProfile with id : " + id);
+        }
         businessProfileRepository.delete(id);
     }
 
     public BusinessProfile getBusinessProfileById(String id) {
         BusinessProfile businessProfile = businessProfileRepository.getById(id);
         if (businessProfile == null) {
-            throw new RuntimeException("No Business Profile with id : " + id);
+            throw new BadRequest("No BusinessProfile with id : " + id);
         }
         return businessProfile;
     }
 
-    public BusinessProfile update(BusinessProfileData businessProfileData) {
+    public BusinessProfile update(String id, BusinessProfileData businessProfileData) {
         BusinessProfile businessProfile = this.businessProfileMapper(businessProfileData);
+        businessProfile.setId(id);
         if (businessProfile.getId() == null || businessProfileRepository.getById(businessProfile.getId())== null) {
-            throw new RuntimeException("Bad Request");
+            throw new BadRequest("No BusinessProfile with id : " + id);
+        }
+        return asyncValidate(businessProfile);
+    }
+
+
+    private BusinessProfile asyncValidate(BusinessProfile businessProfile) {
+        List<Thread> threads = new ArrayList<>();
+        for(Product product: businessProfile.getProducts()) {
+            Thread thread = new Thread(new ValidateProduct(product));
+            thread.start();
+            threads.add(thread);
+        }
+        for(Thread thread: threads) {
+            try {
+                thread.join();
+
+            }
+            catch (InterruptedException e) {
+                log.error(e.getMessage());
+                throw new BadRequest("Validation failed");
+            }
         }
         return businessProfileRepository.save(businessProfile);
     }
