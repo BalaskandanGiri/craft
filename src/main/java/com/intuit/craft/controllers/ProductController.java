@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -29,7 +29,7 @@ public class ProductController {
     }
 
     @PostMapping()
-    public Product postProduct(@RequestBody ProductData product) {
+    public Product postProduct(@Valid @RequestBody ProductData product) {
         return productService.postProduct(product);
     }
 
@@ -47,5 +47,4 @@ public class ProductController {
     public Product putProduct(@RequestBody ProductData product) {
         return productService.update(product);
     }
-
 }

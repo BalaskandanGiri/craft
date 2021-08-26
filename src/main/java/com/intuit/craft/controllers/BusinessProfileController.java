@@ -1,9 +1,8 @@
 package com.intuit.craft.controllers;
 
+import com.intuit.craft.data.BusinessProfileData;
 import com.intuit.craft.entities.BusinessProfile;
-import com.intuit.craft.entities.Product;
 import com.intuit.craft.services.BusinessProfileService;
-import com.intuit.craft.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -38,13 +38,13 @@ public class BusinessProfileController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public BusinessProfile postBusinessProfile(@RequestBody BusinessProfile businessProfile) {
+    public BusinessProfile postBusinessProfile(@Valid @RequestBody BusinessProfileData businessProfile) {
         return businessProfileService.postBusinessProfile(businessProfile);
     }
 
     @PutMapping()
     @ResponseStatus(HttpStatus.OK)
-    public BusinessProfile putBusinessProfile(@RequestBody BusinessProfile businessProfile) {
+    public BusinessProfile putBusinessProfile(@Valid @RequestBody BusinessProfileData businessProfile) {
         return businessProfileService.update(businessProfile);
     }
 

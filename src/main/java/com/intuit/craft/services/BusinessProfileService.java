@@ -1,5 +1,6 @@
 package com.intuit.craft.services;
 
+import com.intuit.craft.data.BusinessProfileData;
 import com.intuit.craft.entities.BusinessProfile;
 import com.intuit.craft.entities.Product;
 import com.intuit.craft.repositories.BusinessProfileRepository;
@@ -21,15 +22,29 @@ public class BusinessProfileService {
     @Autowired
     ProductService productService;
 
+    BusinessProfile businessProfileMapper(BusinessProfileData businessProfileData){
+        BusinessProfile businessProfile = BusinessProfile.builder().companyName(businessProfileData.getCompanyName())
+                .businessAddress(businessProfileData.getBusinessAddress())
+                .legalAddress(businessProfileData.getLegalAddress())
+                .email(businessProfileData.getEmail())
+                .taxIdentifier(businessProfileData.getTaxIdentifier())
+                .website(businessProfileData.getWebsite())
+                .LegalName(businessProfileData.getLegalName())
+                .build();
+        businessProfile.setProducts(businessProfileData.getProducts()
+                .stream()
+                .map(x-> productService.getProductById(x))
+                .collect(Collectors.toList()));
+        return businessProfile;
+
+    }
+
     public List<BusinessProfile> getAllBusinessProfiles() {
         return businessProfileRepository.findAll();
     }
 
-    public BusinessProfile postBusinessProfile(BusinessProfile businessProfile){
-        businessProfile.setProducts(businessProfile.getProducts()
-                .stream()
-                .map(x-> productService.getProductById(x.getId()))
-                .collect(Collectors.toList()));
+    public BusinessProfile postBusinessProfile(BusinessProfileData businessProfileData){
+        BusinessProfile businessProfile = this.businessProfileMapper(businessProfileData);
         List<Thread> threads = new ArrayList<>();
         for(Product product: businessProfile.getProducts()) {
             Thread temp = new Thread(new ValidateProduct(product));
@@ -58,7 +73,8 @@ public class BusinessProfileService {
         return businessProfile;
     }
 
-    public BusinessProfile update(BusinessProfile businessProfile) {
+    public BusinessProfile update(BusinessProfileData businessProfileData) {
+        BusinessProfile businessProfile = this.businessProfileMapper(businessProfileData);
         if (businessProfile.getId() == null || businessProfileRepository.getById(businessProfile.getId())== null) {
             throw new RuntimeException("Bad Request");
         }
