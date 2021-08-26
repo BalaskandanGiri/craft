@@ -1,0 +1,45 @@
+HELP.md
+target/
+.classpath
+.project
+.settings/
+/.metadata/
+/.recommenders/
+
+tests/test-output/
+
+*/bin/
+*.log
+.DS_Store
+/bin/
+bin
+*.rdb
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+###ignore saxonica lic$###
+saxon-license.lic
