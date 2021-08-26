@@ -42,10 +42,10 @@ public class BusinessProfileController {
         return businessProfileService.postBusinessProfile(businessProfile);
     }
 
-    @PutMapping()
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public BusinessProfile putBusinessProfile(@Valid @RequestBody BusinessProfileData businessProfile) {
-        return businessProfileService.update(businessProfile);
+    public BusinessProfile putBusinessProfile(@PathVariable String id,@Valid @RequestBody BusinessProfileData businessProfile) {
+        return businessProfileService.update(id, businessProfile);
     }
 
     @DeleteMapping("/{id}")
