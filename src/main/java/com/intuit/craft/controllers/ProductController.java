@@ -1,5 +1,6 @@
 package com.intuit.craft.controllers;
 
+import com.intuit.craft.data.ProductData;
 import com.intuit.craft.entities.Product;
 import com.intuit.craft.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class ProductController {
     }
 
     @PostMapping()
-    public Product postProduct(@RequestBody Product product) {
+    public Product postProduct(@RequestBody ProductData product) {
         return productService.postProduct(product);
     }
 
@@ -43,7 +44,7 @@ public class ProductController {
     }
 
     @PutMapping()
-    public Product putProduct(@RequestBody Product product) {
+    public Product putProduct(@RequestBody ProductData product) {
         return productService.update(product);
     }
 

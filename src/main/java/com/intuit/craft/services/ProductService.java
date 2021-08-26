@@ -1,5 +1,6 @@
 package com.intuit.craft.services;
 
+import com.intuit.craft.data.ProductData;
 import com.intuit.craft.entities.Product;
 import com.intuit.craft.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +14,18 @@ public class ProductService implements ProductValidator{
     @Autowired
     ProductRepository productRepository;
 
+    Product productMapper(ProductData productData) {
+        return Product.builder().name(productData.getName())
+                .description(productData.getDescription())
+                .build();
+    }
+
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    public Product postProduct(Product product) {
+    public Product postProduct(ProductData productData) {
+        Product product = this.productMapper(productData);
         return productRepository.save(product);
     }
 
@@ -31,7 +39,8 @@ public class ProductService implements ProductValidator{
 
     public void delete(String id) {productRepository.delete(id);}
 
-    public Product update(Product product) {
+    public Product update(ProductData productData) {
+        Product product = this.productMapper(productData);
         if (product.getId() == null || getProductById(product.getId()) == null) {
             throw new RuntimeException("Bad Request");
         }
